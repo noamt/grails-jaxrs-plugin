@@ -1,1 +1,2 @@
 language: groovy
+script: bundle exec ./gradlew check --stacktrace --info
