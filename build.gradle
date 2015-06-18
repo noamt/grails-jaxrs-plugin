@@ -118,6 +118,13 @@ dependencies {
     }
 }
 
+test {
+    testLogging {
+        events 'failed'
+        exceptionFormat 'short'
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
