@@ -17,10 +17,8 @@ import javax.ws.rs.core.HttpHeaders
 /**
  * @author Noam Y. Tenne
  */
-@Integration
 abstract class IntegrationTestSpec extends Specification {
 
-    @Shared
     @Autowired
     GrailsApplication grailsApplication
 
