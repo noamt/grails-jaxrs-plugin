@@ -7,7 +7,7 @@ import org.grails.jaxrs.web.JaxrsListener
 class JaxrsGrailsPlugin {
     def groupId = "org.grails.plugins"
     def version = "0.11"
-    def grailsVersion = "2.4 > *"
+    def grailsVersion = "3.0 > *"
 
     /**
      * Adds the JaxrsFilter and JaxrsListener to the web application
