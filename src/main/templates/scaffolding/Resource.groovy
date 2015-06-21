@@ -7,28 +7,26 @@ import javax.ws.rs.Produces
 import javax.ws.rs.PUT
 import javax.ws.rs.core.Response
 
-import org.grails.jaxrs.provider.DomainObjectNotFoundException
-
 @Consumes(['application/xml','application/json'])
 @Produces(['application/xml','application/json'])
-class ${resourceName}Resource {
+class ${simpleName}Resource {
 
-    def ${resourceProp}ResourceService
+    def ${propertyName}ResourceService
     def id
 
     @GET
     Response read() {
-        ok ${resourceProp}ResourceService.read(id)
+        ok ${propertyName}ResourceService.read(id)
     }
 
     @PUT
-    Response update(${resourceName} dto) {
+    Response update(${simpleName} dto) {
         dto.id = id
-        ok ${resourceProp}ResourceService.update(dto)
+        ok ${propertyName}ResourceService.update(dto)
     }
 
     @DELETE
     void delete() {
-        ${resourceProp}ResourceService.delete(id)
+        ${propertyName}ResourceService.delete(id)
     }
 }

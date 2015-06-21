@@ -11,22 +11,22 @@ import javax.ws.rs.core.Response
 @Path('/api/${resourcePath}')
 @Consumes(['application/xml','application/json'])
 @Produces(['application/xml','application/json'])
-class ${resourceName}CollectionResource {
+class ${simpleName}CollectionResource {
 
-    def ${resourceProp}ResourceService
+    def ${propertyName}ResourceService
 
     @POST
-    Response create(${resourceName} dto) {
-        created ${resourceProp}ResourceService.create(dto)
+    Response create(${simpleName} dto) {
+        created ${propertyName}ResourceService.create(dto)
     }
 
     @GET
     Response readAll() {
-        ok ${resourceProp}ResourceService.readAll()
+        ok ${propertyName}ResourceService.readAll()
     }
 
     @Path('/{id}')
-    ${resourceName}Resource getResource(@PathParam('id') Long id) {
-        new ${resourceName}Resource(${resourceProp}ResourceService: ${resourceProp}ResourceService, id:id)
+    ${simpleName}Resource getResource(@PathParam('id') Long id) {
+        new ${simpleName}Resource(${propertyName}ResourceService: ${propertyName}ResourceService, id:id)
     }
 }

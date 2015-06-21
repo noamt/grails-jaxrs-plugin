@@ -1,34 +1,34 @@
 <%=packageName ? "package ${packageName}\n\n" : ''%>import org.grails.jaxrs.provider.DomainObjectNotFoundException
 
-class ${resourceName}ResourceService {
+class ${simpleName}ResourceService {
 
-    def create(${resourceName} dto) {
+    def create(${simpleName} dto) {
         dto.save()
     }
 
     def read(id) {
-        def obj = ${resourceName}.get(id)
+        def obj = ${simpleName}.get(id)
         if (!obj) {
-            throw new DomainObjectNotFoundException(${resourceName}.class, id)
+            throw new DomainObjectNotFoundException(${simpleName}.class, id)
         }
         obj
     }
 
     def readAll() {
-        ${resourceName}.findAll()
+        ${simpleName}.findAll()
     }
 
-    def update(${resourceName} dto) {
-        def obj = ${resourceName}.get(dto.id)
+    def update(${simpleName} dto) {
+        def obj = ${simpleName}.get(dto.id)
         if (!obj) {
-            throw new DomainObjectNotFoundException(${resourceName}.class, dto.id)
+            throw new DomainObjectNotFoundException(${simpleName}.class, dto.id)
         }
         obj.properties = dto.properties
         obj
     }
 
     void delete(id) {
-        def obj = ${resourceName}.get(id)
+        def obj = ${simpleName}.get(id)
         if (obj) {
             obj.delete()
         }
