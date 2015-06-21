@@ -1,13 +1,13 @@
-@artifact.package@import javax.ws.rs.GET
+<%=packageName ? "package ${packageName}\n\n" : ''%>import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 
-@Path('/api/@resource.path@')
-class @artifact.name@ {
+@Path('/api/${propertyName}')
+class ${simpleName} {
 
     @GET
     @Produces('text/plain')
-    String get@resource.name@Representation() {
-        '@resource.name@'
+    String get${simpleName}Representation() {
+        '${simpleName}'
     }
 }

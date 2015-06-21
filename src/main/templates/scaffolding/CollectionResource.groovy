@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam
 import javax.ws.rs.POST
 import javax.ws.rs.core.Response
 
-@Path('/api/${resourcePath}')
+@Path('/api/${propertyName}')
 @Consumes(['application/xml','application/json'])
 @Produces(['application/xml','application/json'])
 class ${simpleName}CollectionResource {
