@@ -17,7 +17,7 @@ package org.grails.jaxrs.infra
 
 import grails.core.GrailsApplication
 import grails.spring.BeanBuilder
-import grails.web.servlet.context.GrailsWebApplicationContext
+import org.springframework.context.ApplicationContext
 
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -57,7 +57,7 @@ class IntegrationTestEnvironment {
     synchronized JaxrsContext getJaxrsContext() {
         if (!jaxrsContext) {
             GrailsApplication application = Holders.grailsApplication
-            GrailsWebApplicationContext applicationContext = application.mainContext
+            ApplicationContext applicationContext = application.mainContext
 
             BeanBuilder beanBuilder = new BeanBuilder(applicationContext)
             beanBuilder.importBeans "org/grails/jaxrs/itest/integrationTestEnvironment.xml, ${contextConfigLocations}"

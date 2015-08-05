@@ -12,7 +12,7 @@ import org.grails.jaxrs.web.JaxrsContext
 
 import static org.grails.jaxrs.web.JaxrsUtils.JAXRS_CONTEXT_NAME
 
-class GrailsJaxrsGrailsPlugin extends Plugin {
+class JaxrsGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.0.1 > *"
@@ -101,7 +101,7 @@ Apache Wink are likely to be added in upcoming versions of the plugin.
             "${DomainObjectWriter.name}"(DomainObjectWriter)
 
             // Configure application-provided resources
-            application.resourceClasses.each { rc ->
+            grailsApplication.resourceClasses.each { rc ->
                 "${rc.propertyName}"(rc.clazz) { bean ->
                     bean.scope = owner.getResourceScope(application)
                     bean.autowire = true
@@ -109,7 +109,7 @@ Apache Wink are likely to be added in upcoming versions of the plugin.
             }
 
             // Configure application-provided providers
-            application.providerClasses.each { pc ->
+            grailsApplication.providerClasses.each { pc ->
                 "${pc.propertyName}"(pc.clazz) { bean ->
                     bean.scope = 'singleton'
                     bean.autowire = true
@@ -137,9 +137,9 @@ Apache Wink are likely to be added in upcoming versions of the plugin.
         def context = applicationContext.getBean(JAXRS_CONTEXT_NAME)
         def config = context.jaxrsConfig
 
-        context.jaxrsProviderName = getProviderName(application)
-        context.jaxrsProviderExtraPaths = getProviderExtraPaths(application)
-        context.jaxrsProviderInitParameters = getProviderInitParameters(application)
+        context.jaxrsProviderName = getProviderName(grailsApplication)
+        context.jaxrsProviderExtraPaths = getProviderExtraPaths(grailsApplication)
+        context.jaxrsProviderInitParameters = getProviderInitParameters(grailsApplication)
 
         config.reset()
         config.classes << XMLWriter
@@ -149,10 +149,10 @@ Apache Wink are likely to be added in upcoming versions of the plugin.
         config.classes << DomainObjectReader
         config.classes << DomainObjectWriter
 
-        application.getArtefactInfo('Resource').classesByName.values().each { clazz ->
+        grailsApplication.getArtefactInfo('Resource').classesByName.values().each { clazz ->
             config.classes << clazz
         }
-        application.getArtefactInfo('Provider').classesByName.values().each { clazz ->
+        grailsApplication.getArtefactInfo('Provider').classesByName.values().each { clazz ->
             config.classes << clazz
         }
     }
@@ -166,16 +166,16 @@ Apache Wink are likely to be added in upcoming versions of the plugin.
             return
         }
 
-        if (application.isArtefactOfType(ResourceArtefactHandler.TYPE, event.source)) {
-            def resourceClass = application.addArtefact(ResourceArtefactHandler.TYPE, event.source)
+        if (grailsApplication.isArtefactOfType(ResourceArtefactHandler.TYPE, event.source)) {
+            def resourceClass = grailsApplication.addArtefact(ResourceArtefactHandler.TYPE, event.source)
             beans {
                 "${resourceClass.propertyName}"(resourceClass.clazz) { bean ->
-                    bean.scope = owner.getResourceScope(application)
+                    bean.scope = owner.getResourceScope(grailsApplication)
                     bean.autowire = true
                 }
             }.registerBeans(event.ctx)
-        } else if (application.isArtefactOfType(ProviderArtefactHandler.TYPE, event.source)) {
-            def providerClass = application.addArtefact(ProviderArtefactHandler.TYPE, event.source)
+        } else if (grailsApplication.isArtefactOfType(ProviderArtefactHandler.TYPE, event.source)) {
+            def providerClass = grailsApplication.addArtefact(ProviderArtefactHandler.TYPE, event.source)
             beans {
                 "${providerClass.propertyName}"(providerClass.clazz) { bean ->
                     bean.scope = 'singleton'

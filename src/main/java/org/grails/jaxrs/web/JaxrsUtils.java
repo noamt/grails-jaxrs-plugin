@@ -73,6 +73,6 @@ public class JaxrsUtils {
      */
     public static JaxrsContext getRequiredJaxrsContext(ServletContext servletContext) {
         ApplicationContext ac = getRequiredWebApplicationContext(servletContext);
-        return (JaxrsContext)ac.getBean(JAXRS_CONTEXT_NAME, JaxrsContext.class);
+        return ac.getBean(JAXRS_CONTEXT_NAME, JaxrsContext.class);
     }
 }
