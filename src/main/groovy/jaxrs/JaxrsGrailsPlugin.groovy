@@ -72,7 +72,7 @@ Brief summary/description of the plugin.
         // Configure application-provided resources
         grailsApplication.resourceClasses.each { rc ->
             "${rc.propertyName}"(rc.clazz) { bean ->
-                bean.scope = owner.getResourceScope(application)
+                bean.scope = owner.getResourceScope()
                 bean.autowire = true
             }
         }
@@ -124,7 +124,7 @@ Brief summary/description of the plugin.
             def resourceClass = grailsApplication.addArtefact(ResourceArtefactHandler.TYPE, event.source)
             beans {
                 "${resourceClass.propertyName}"(resourceClass.clazz) { bean ->
-                    bean.scope = owner.getResourceScope(grailsApplication)
+                    bean.scope = owner.getResourceScope()
                     bean.autowire = true
                 }
             }.registerBeans(event.ctx)
@@ -173,8 +173,8 @@ Brief summary/description of the plugin.
         grailsApplication.config.grails.plugins.jaxrs.provider.init.parameters
     }
 
-    private String getResourceScope(application) {
-        def scope = application.config.org.grails.jaxrs.resource.scope
+    private String getResourceScope() {
+        def scope = grailsApplication.config.org.grails.jaxrs.resource.scope
         if (!scope) {
             scope = 'prototype'
         }
