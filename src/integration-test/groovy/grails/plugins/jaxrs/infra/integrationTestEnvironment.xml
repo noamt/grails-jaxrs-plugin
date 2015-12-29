@@ -1,0 +1,22 @@
+<beans>
+
+    <bean id="jaxrsContext" class="grails.plugins.grails.plugins.jaxrs.web.JaxrsContext" />
+
+    <!--
+        Find out why Jersey complains when scope="singleton" is
+        not explicitly set. Seems that there's an interop issue
+        with Jersey and Spring 3.0.
+     -->
+
+    <bean scope="singleton" class="grails.plugins.jaxrs.provider.JSONWriter" />
+    <bean scope="singleton" class="grails.plugins.jaxrs.provider.JSONReader">
+        <property name="grailsApplication" ref="grailsApplication" />
+    </bean>
+    <bean scope="singleton" class="grails.plugins.jaxrs.provider.DomainObjectWriter">
+        <property name="grailsApplication" ref="grailsApplication" />
+    </bean>
+    <bean scope="singleton" class="grails.plugins.jaxrs.provider.DomainObjectReader">
+        <property name="grailsApplication" ref="grailsApplication" />
+    </bean>
+
+</beans>
