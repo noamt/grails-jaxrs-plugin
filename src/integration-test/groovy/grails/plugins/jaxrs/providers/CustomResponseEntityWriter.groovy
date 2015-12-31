@@ -13,11 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grails.plugins.jaxrs
+package grails.plugins.jaxrs.providers
+
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MultivaluedMap
+import javax.ws.rs.ext.Provider
+
+import grails.plugins.jaxrs.support.MessageBodyWriterSupport
 
 /**
  * @author Martin Krasser
  */
-class CustomResponseEntity {
-    String content
+@Provider
+@Produces('text/plain')
+class CustomResponseEntityWriter extends MessageBodyWriterSupport<CustomResponseEntity> {
+
+     void writeTo(CustomResponseEntity entity, MultivaluedMap httpHeaders, OutputStream entityStream) {
+         entityStream << entity.content
+     }
 }

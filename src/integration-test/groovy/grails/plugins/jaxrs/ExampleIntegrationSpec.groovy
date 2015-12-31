@@ -1,5 +1,7 @@
 package grails.plugins.jaxrs
 
+import grails.plugins.jaxrs.providers.CustomRequestEntityReader
+import grails.plugins.jaxrs.providers.CustomResponseEntityWriter
 import grails.test.mixin.TestFor
 import grails.test.mixin.integration.Integration
 import grails.plugins.jaxrs.infra.IntegrationTestSpec
@@ -17,9 +19,9 @@ class ExampleIntegrationSpec extends IntegrationTestSpec {
 
     List getJaxrsClasses() {
         [TestResource01,
-                TestResource02,
-                CustomRequestEntityReader,
-                CustomResponseEntityWriter]
+         TestResource02,
+         CustomRequestEntityReader,
+         CustomResponseEntityWriter]
     }
 
     static doWithSpring = {

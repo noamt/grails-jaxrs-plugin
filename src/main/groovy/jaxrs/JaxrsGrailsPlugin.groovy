@@ -1,15 +1,11 @@
 package jaxrs
 
-import grails.plugins.*
+import grails.plugins.Plugin
+import grails.plugins.jaxrs.DefaultJaxrsConfig
 import grails.plugins.jaxrs.ProviderArtefactHandler
 import grails.plugins.jaxrs.ResourceArtefactHandler
 import grails.plugins.jaxrs.generator.CodeGenerator
-import grails.plugins.jaxrs.provider.DomainObjectReader
-import grails.plugins.jaxrs.provider.DomainObjectWriter
-import grails.plugins.jaxrs.provider.JSONReader
-import grails.plugins.jaxrs.provider.JSONWriter
-import grails.plugins.jaxrs.provider.XMLReader
-import grails.plugins.jaxrs.provider.XMLWriter
+import grails.plugins.jaxrs.provider.*
 import grails.plugins.jaxrs.web.JaxrsContext
 
 import static grails.plugins.jaxrs.web.JaxrsUtils.JAXRS_CONTEXT_NAME
@@ -20,7 +16,7 @@ class JaxrsGrailsPlugin extends Plugin {
     def grailsVersion = "3.0.10 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+            "grails-app/views/error.gsp"
     ]
 
     // TODO Fill in these fields
@@ -34,7 +30,6 @@ Brief summary/description of the plugin.
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/jaxrs"
-
 
     // Extra (optional) plugin metadata
 
@@ -57,44 +52,49 @@ Brief summary/description of the plugin.
 
     def artefacts = [grails.plugins.jaxrs.ProviderArtefactHandler, grails.plugins.jaxrs.ResourceArtefactHandler]
 
-    Closure doWithSpring() { {->
-            // TODO Implement runtime spring config (optional)
-        jaxrsContext(JaxrsContext)
-
-        // Configure default providers
-        "${XMLWriter.name}"(XMLWriter)
-        "${XMLReader.name}"(XMLReader)
-        "${JSONWriter.name}"(JSONWriter)
-        "${JSONReader.name}"(JSONReader)
-        "${DomainObjectReader.name}"(DomainObjectReader)
-        "${DomainObjectWriter.name}"(DomainObjectWriter)
-
-        // Configure application-provided resources
-        grailsApplication.resourceClasses.each { rc ->
-            "${rc.propertyName}"(rc.clazz) { bean ->
-                bean.scope = owner.getResourceScope()
-                bean.autowire = true
-            }
-        }
-
-        // Configure application-provided providers
-        grailsApplication.providerClasses.each { pc ->
-            "${pc.propertyName}"(pc.clazz) { bean ->
-                bean.scope = 'singleton'
-                bean.autowire = true
-            }
-        }
-
-        // Configure the resource code generator
-        "${CodeGenerator.name}"(CodeGenerator)
+    Closure doWithSpring() {
+        { ->
             jaxrsContext(JaxrsContext)
+            defaultJaxrsConfig DefaultJaxrsConfig
+
+            // Configure default providers
+            "${XMLWriter.name}"(XMLWriter)
+            "${XMLReader.name}"(XMLReader)
+            "${JSONWriter.name}"(JSONWriter)
+            "${JSONReader.name}"(JSONReader)
+            "${DomainObjectReader.name}"(DomainObjectReader)
+            "${DomainObjectWriter.name}"(DomainObjectWriter)
+
+            // Configure application-provided resources
+            grailsApplication.resourceClasses.each { rc ->
+                "${rc.propertyName}"(rc.clazz) { bean ->
+                    bean.scope = owner.getResourceScope()
+                    bean.autowire = true
+                }
+            }
+
+            // Configure application-provided providers
+            grailsApplication.providerClasses.each { pc ->
+                "${pc.propertyName}"(pc.clazz) { bean ->
+                    bean.scope = 'singleton'
+                    bean.autowire = true
+                }
+            }
+
+            // Configure the resource code generator
+            "${CodeGenerator.name}"(CodeGenerator)
+
+
         }
+
     }
+
 
     void doWithDynamicMethods() {
         // TODO Implement registering dynamic methods to classes (optional)
     }
 
+    @Override
     void doWithApplicationContext() {
         def context = applicationContext.getBean(JAXRS_CONTEXT_NAME)
         def config = context.jaxrsConfig
@@ -111,6 +111,12 @@ Brief summary/description of the plugin.
         config.classes << DomainObjectReader
         config.classes << DomainObjectWriter
 
+        grailsApplication.getArtefactInfo('Resource').classesByName.values().each { clazz ->
+            config.classes << clazz
+        }
+        grailsApplication.getArtefactInfo('Provider').classesByName.values().each { clazz ->
+            config.classes << clazz
+        }
 
     }
 

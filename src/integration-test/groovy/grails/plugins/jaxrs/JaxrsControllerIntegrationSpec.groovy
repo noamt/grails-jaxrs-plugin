@@ -1,8 +1,14 @@
 package grails.plugins.jaxrs
 
 import grails.plugins.jaxrs.infra.IntegrationTestSpec
+import grails.plugins.jaxrs.providers.CustomRequestEntityReader
+import grails.plugins.jaxrs.providers.CustomResponseEntityWriter
 import grails.plugins.jaxrs.web.JaxrsContext
 import org.springframework.beans.factory.annotation.Autowired
+
+import java.nio.charset.Charset
+
+
 
 
 /*
@@ -36,14 +42,14 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
     // so jaxrses are added here ...
     List getJaxrsClasses() {
         [TestResource01,
-                TestResource02,
-                TestResource03,
-                TestResource04,
-                TestResource05,
-                TestResource06,
-                TestQueryParamResource,
-                CustomRequestEntityReader,
-                CustomResponseEntityWriter]
+         TestResource02,
+         TestResource03,
+         TestResource04,
+         TestResource05,
+         TestResource06,
+         TestQueryParamResource,
+         CustomRequestEntityReader,
+         CustomResponseEntityWriter]
     }
 
     def "Execute a GET request"() {
@@ -233,4 +239,277 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.status == 200
         response.contentAsString == 'jim'
     }
+
+    def 'testGet01'() {
+        when:
+        sendRequest('/test/01', 'GET')
+
+        then:
+        200 == response.status
+        'test01'== response.contentAsString
+        response.getHeader('Content-Type').startsWith('text/plain')
+    }
+
+
+    def 'testPost02'() {
+        when:
+        sendRequest('/test/02', 'POST', ['Content-Type': 'text/plain'], 'hello'.bytes)
+
+        then:
+        200== response.status
+        'response:hello' == response.contentAsString
+        response.getHeader('Content-Type').startsWith('text/plain')
+    }
+
+
+    def 'testPost03'() {
+        when:
+        sendRequest('/test/03', 'POST', ['Content-Type': 'application/json'], '{"age":38,"name":"mike"}'.bytes)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('"age":39')
+        response.contentAsString.contains('"name":"ekim"')
+        response.getHeader('Content-Type').startsWith('application/json')
+    }
+
+    def 'testPost06'() {
+        when:
+        sendRequest('/test/06', 'POST', ['Content-Type': 'application/json'], '{"age":38,"name":"mike"}'.bytes)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('<age>39</age>')
+        response.contentAsString.contains('<name>ekim</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testPost03_CustomCharset'() {
+        when:
+        String CUSTOM_CHARSET = 'UTF-16'
+        sendRequest('/test/03', 'POST', ['Content-Type': "application/json; charset=${CUSTOM_CHARSET}".toString()], '{"class":"TestPerson","age":38,"name":"mike"}'.getBytes(CUSTOM_CHARSET))
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('"age":39')
+        response.contentAsString.contains('"name":"ekim"')
+        response.getHeader('Content-Type').startsWith('application/json')
+    }
+
+
+    def 'testRoundtrip04XmlSingle'() {
+        when:
+        def headers = ['Content-Type': 'application/xml', 'Accept': 'application/xml']
+        sendRequest('/test/04/single', 'POST', headers, '<testPerson><name>james</name></testPerson>'.bytes)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('<name>semaj</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+    def 'testRoundtrip04JsonSingle'() {
+        when:
+        def headers = ['Content-Type': 'application/json', 'Accept': 'application/json']
+        sendRequest('/test/04/single', 'POST', headers, '{"class":"TestPerson","age":25,"name":"james"}'.bytes)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('"age":26')
+        response.contentAsString.contains('"name":"semaj"')
+        response.getHeader('Content-Type').startsWith('application/json')
+    }
+
+
+    def 'testRoundtrip04JsonSingle_CustomCharset'() {
+        setup:
+        String CUSTOM_CHARSET = 'UTF-16'
+        def headers = ['Content-Type': "application/json; charset=${CUSTOM_CHARSET}".toString(), 'Accept': 'application/json']
+        def testPersonWithCustomEncoding = '{"class":"TestPerson","age":45,"name":"james"}'.getBytes(Charset.forName(CUSTOM_CHARSET))
+
+        when:
+        sendRequest('/test/04/single', 'POST', headers, testPersonWithCustomEncoding)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('"age":46')
+        response.contentAsString.contains('"name":"semaj"')
+        response.getHeader('Content-Type').startsWith('application/json')
+    }
+
+    def 'testRoundtrip04XmlSingle_CustomCharset'() {
+        setup:
+        String CUSTOM_CHARSET = 'UTF-16'
+        def headers = ['Content-Type': "application/xml; charset=${CUSTOM_CHARSET}".toString(), 'Accept': 'application/xml']
+        byte[] testPersonWithCustomEncoding = '<testPerson><name>james</name></testPerson>'.getBytes(Charset.forName(CUSTOM_CHARSET))
+
+        when:
+        sendRequest('/test/04/single', 'POST', headers, testPersonWithCustomEncoding)
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('<name>semaj</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testGet04XmlCollectionGeneric'() {
+        when:
+        sendRequest('/test/04/multi/generic', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        response.contentAsString.contains('<list>')
+        response.contentAsString.contains('<name>n1</name>')
+        response.contentAsString.contains('<name>n2</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testGet04XmlCollectionGenericGenericOnly'() {
+        setup:
+        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+
+        when:
+        sendRequest('/test/04/multi/generic', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        response.contentAsString.contains('<list>')
+        response.contentAsString.contains('<name>n1</name>')
+        response.contentAsString.contains('<name>n2</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testGet04XmlCollectionRaw'() {
+        when:
+        sendRequest('/test/04/multi/raw', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('<list>')
+        response.contentAsString.contains('<name>n1</name>')
+        response.contentAsString.contains('<name>n2</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testGet04XmlCollectionRawGenericOnly'() {
+        setup:
+        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+
+        when:
+        sendRequest('/test/04/multi/raw', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        500 == response.status
+    }
+
+
+    def 'testGet04XmlCollectionObject'() {
+        when:
+        sendRequest('/test/04/multi/object', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('<list>')
+        response.contentAsString.contains('<name>n1</name>')
+        response.contentAsString.contains('<name>n2</name>')
+        response.getHeader('Content-Type').startsWith('application/xml')
+    }
+
+
+    def 'testGet04XmlCollectionObjectGenericOnly'() {
+        setup:
+        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+
+        when:
+        sendRequest('/test/04/multi/object', 'GET', ['Accept': 'application/xml'])
+
+        then:
+        500 == response.status
+    }
+
+
+    def 'testGet04JsonCollectionGeneric'() {
+        when:
+        sendRequest('/test/04/multi/generic', 'GET', ['Accept': 'application/json'])
+
+        then:
+        200 == response.status
+        response.contentAsString.contains('"name":"n1"')
+        response.contentAsString.contains('"name":"n2"')
+        response.getHeader('Content-Type').startsWith('application/json')
+    }
+
+
+    def 'testPost04ReaderDisabled'() {
+        setup:
+        grailsApplication.config.org.grails.jaxrs.doreader.disable = true
+
+        when:
+        sendRequest('/test/04/single', 'POST', ['Content-Type': 'application/xml'], '<testPerson><name>james</name></testPerson>'.bytes)
+
+        then:
+        415 == response.status
+    }
+
+
+    def 'testPost04WriterDisabled'() {
+        setup:
+        grailsApplication.config.org.grails.jaxrs.dowriter.disable = true
+        def headers = ['Content-Type': 'application/xml', 'Accept': 'application/xml']
+
+        when:
+        sendRequest('/test/04/single', 'POST', headers, '<testPerson><name>james</name></testPerson>'.bytes)
+
+        then:
+        500 == response.status
+    }
+
+
+    def 'testPost04DefaultResponse'() {
+        when:
+        sendRequest('/test/04/single', 'POST', ['Content-Type': 'application/xml'], '<testPerson><name>james</name></testPerson>'.bytes)
+
+        then:
+        200 == response.status
+        println 'default: ' + response.contentAsString
+        println 'content: ' + response.getHeader('Content-Type')
+    }
+
+
+    def 'testGet05HtmlResponse'() {
+        when:
+        sendRequest('/test/05', 'GET')
+
+        then:
+        200 == response.status
+        '<html><body>test05</body></html>' == response.contentAsString
+        response.getHeader('Content-Type').startsWith('text/html')
+    }
+
+//    def 'specifyQueryParamsOnController'() {
+//
+//        controller.request.queryString = 'value=jim'
+//        sendRequest('/test/queryParam', 'GET')
+//        200 == response.status
+//        'jim' == response.contentAsString
+//    }
+
+    def 'specifyQueryParamsInRequestPath'() {
+        when:
+        sendRequest('/test/queryParam?value=jim', 'GET')
+
+        then:
+        200 == response.status
+        'jim' == response.contentAsString
+    }
+
+//    def 'specifyQueryParamsOnControllerAndInRequestPath'() {
+//        controller.request.queryString = 'value=bob'
+//        sendRequest('/test/queryParam?value=jim', 'GET')
+//        200 == response.status
+//        'jim' == response.contentAsString
+//    }
 }

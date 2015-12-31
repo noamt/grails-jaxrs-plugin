@@ -15,6 +15,9 @@
  */
 package grails.plugins.jaxrs
 
+import grails.plugins.jaxrs.providers.CustomRequestEntity
+import grails.plugins.jaxrs.providers.CustomResponseEntity
+
 import javax.ws.rs.Consumes
 import javax.ws.rs.POST
 import javax.ws.rs.Path

@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grails.plugins.jaxrs
-
-import javax.ws.rs.Consumes
-import javax.ws.rs.core.MultivaluedMap
-import javax.ws.rs.ext.Provider
-
-import grails.plugins.jaxrs.support.MessageBodyReaderSupport
+package grails.plugins.jaxrs.providers
 
 /**
  * @author Martin Krasser
  */
-@Provider
-@Consumes('text/plain')
-class CustomRequestEntityReader extends MessageBodyReaderSupport<CustomRequestEntity> {
-
-     CustomRequestEntity readFrom(MultivaluedMap httpHeaders, InputStream entityStream) {
-         new CustomRequestEntity(content:entityStream.text)
-     }
+class CustomRequestEntity {
+    String content
 }

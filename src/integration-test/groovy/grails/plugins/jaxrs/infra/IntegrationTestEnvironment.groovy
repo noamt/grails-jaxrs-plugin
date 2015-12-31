@@ -16,7 +16,8 @@
 package grails.plugins.jaxrs.infra
 
 import grails.core.GrailsApplication
-import grails.plugins.jaxrs.TestResource01
+import grails.plugins.jaxrs.provider.XMLReader
+import grails.plugins.jaxrs.provider.XMLWriter
 import grails.spring.BeanBuilder
 import grails.util.Holders
 import grails.plugins.jaxrs.ProviderArtefactHandler
@@ -28,6 +29,7 @@ import grails.plugins.jaxrs.provider.JSONWriter
 import grails.plugins.jaxrs.web.JaxrsContext
 import grails.plugins.jaxrs.web.JaxrsListener
 import grails.plugins.jaxrs.web.JaxrsUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 
 import javax.servlet.ServletContextEvent
@@ -38,6 +40,7 @@ import javax.servlet.ServletContextListener
  */
 class IntegrationTestEnvironment {
 
+    @Autowired
     private JaxrsContext jaxrsContext
 
     private String contextConfigLocations
@@ -68,16 +71,18 @@ class IntegrationTestEnvironment {
                 application.getArtefacts(ResourceArtefactHandler.TYPE).each { gc ->
                     jaxrsClasses << gc.clazz
                 }
-                application.getArtefacts(TYPE).each { gc ->
+                application.getArtefacts(ProviderArtefactHandler.TYPE).each { gc ->
                     jaxrsClasses << gc.clazz
                 }
             }
 
 //            if (jaxrsProviderName == JaxrsContext.JAXRS_PROVIDER_NAME_RESTLET) {
-            jaxrsClasses << JSONReader
-            jaxrsClasses << JSONWriter
-            jaxrsClasses << DomainObjectReader
-            jaxrsClasses << DomainObjectWriter
+                jaxrsClasses << JSONReader
+                jaxrsClasses << JSONWriter
+                jaxrsClasses << XMLReader
+                jaxrsClasses << XMLWriter
+                jaxrsClasses << DomainObjectReader
+                jaxrsClasses << DomainObjectWriter
 //            }
 
             beanBuilder.beans {
