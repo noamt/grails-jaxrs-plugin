@@ -5,6 +5,7 @@ import grails.plugins.jaxrs.providers.CustomRequestEntityReader
 import grails.plugins.jaxrs.providers.CustomResponseEntityWriter
 import grails.plugins.jaxrs.web.JaxrsContext
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Unroll
 
 import java.nio.charset.Charset
 
@@ -161,7 +162,7 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.status == 500
 
         cleanup:
-        grailsApplication.config.org.grails.plugins.jaxrs.dowriter.require.generic.collections = false
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = false
 
         where:
         mode << ['raw', 'object']
@@ -177,10 +178,11 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.getHeader('Content-Type').startsWith('application/json')
     }
 
+    @Unroll
     def "Post content to resource 04 while the IO facilities are disabled"() {
         setup:
         def headers = ['Content-Type': 'application/xml', 'Accept': 'application/xml']
-        grailsApplication.config.org.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = true
+        grailsApplication.config.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = true
 
         when:
         sendRequest('/test/04/single', 'POST', headers, '<testPerson><name>james</name></testPerson>'.bytes)
@@ -189,7 +191,7 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.status == expectedStatus
 
         cleanup:
-        grailsApplication.config.org.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = false
+        grailsApplication.config.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = false
 
         where:
         facilityToDisabled | expectedStatus
