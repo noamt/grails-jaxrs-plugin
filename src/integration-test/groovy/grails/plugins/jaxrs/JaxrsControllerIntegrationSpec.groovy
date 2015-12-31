@@ -116,6 +116,7 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
     def "Retrieve a generic XML collection from resource 04"() {
         setup:
+        def before = grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections
         grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = genericOnly
 
         when:
@@ -126,6 +127,9 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.contentAsString.contains('<name>n1</name>')
         response.contentAsString.contains('<name>n2</name>')
         response.getHeader('Content-Type').startsWith('application/xml')
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = before
 
         where:
         genericOnly << [true, false]
@@ -156,6 +160,9 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         then:
         response.status == 500
 
+        cleanup:
+        grailsApplication.config.org.grails.plugins.jaxrs.dowriter.require.generic.collections = false
+
         where:
         mode << ['raw', 'object']
     }
@@ -173,13 +180,16 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
     def "Post content to resource 04 while the IO facilities are disabled"() {
         setup:
         def headers = ['Content-Type': 'application/xml', 'Accept': 'application/xml']
-        grailsApplication.config.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = true
+        grailsApplication.config.org.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = true
 
         when:
         sendRequest('/test/04/single', 'POST', headers, '<testPerson><name>james</name></testPerson>'.bytes)
 
         then:
         response.status == expectedStatus
+
+        cleanup:
+        grailsApplication.config.org.grails.plugins.jaxrs.getProperty("do${facilityToDisabled}").disable = false
 
         where:
         facilityToDisabled | expectedStatus
@@ -217,6 +227,10 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         then:
         response.status == 200
         response.contentAsString == 'jim'
+
+        cleanup:
+        controller.request.queryString = null
+
     }
 
     def "Specify query params in the request path"() {
@@ -238,6 +252,10 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         then:
         response.status == 200
         response.contentAsString == 'jim'
+
+        cleanup:
+        controller.request.queryString = null
+
     }
 
     def 'testGet01'() {
@@ -368,7 +386,7 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
     def 'testGet04XmlCollectionGenericGenericOnly'() {
         setup:
-        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = true
 
         when:
         sendRequest('/test/04/multi/generic', 'GET', ['Accept': 'application/xml'])
@@ -378,6 +396,9 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.contentAsString.contains('<name>n1</name>')
         response.contentAsString.contains('<name>n2</name>')
         response.getHeader('Content-Type').startsWith('application/xml')
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = false
     }
 
 
@@ -396,13 +417,16 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
     def 'testGet04XmlCollectionRawGenericOnly'() {
         setup:
-        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = true
 
         when:
         sendRequest('/test/04/multi/raw', 'GET', ['Accept': 'application/xml'])
 
         then:
         500 == response.status
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = false
     }
 
 
@@ -421,13 +445,16 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
     def 'testGet04XmlCollectionObjectGenericOnly'() {
         setup:
-        grailsApplication.config.org.grails.jaxrs.dowriter.require.generic.collections = true
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = true
 
         when:
         sendRequest('/test/04/multi/object', 'GET', ['Accept': 'application/xml'])
 
         then:
         500 == response.status
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.require.generic.collections = false
     }
 
 
@@ -445,19 +472,22 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
     def 'testPost04ReaderDisabled'() {
         setup:
-        grailsApplication.config.org.grails.jaxrs.doreader.disable = true
+        grailsApplication.config.grails.plugins.jaxrs.doreader.disable = true
 
         when:
         sendRequest('/test/04/single', 'POST', ['Content-Type': 'application/xml'], '<testPerson><name>james</name></testPerson>'.bytes)
 
         then:
         415 == response.status
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.doreader.disable = false
     }
 
 
     def 'testPost04WriterDisabled'() {
         setup:
-        grailsApplication.config.org.grails.jaxrs.dowriter.disable = true
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.disable = true
         def headers = ['Content-Type': 'application/xml', 'Accept': 'application/xml']
 
         when:
@@ -465,6 +495,9 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
 
         then:
         500 == response.status
+
+        cleanup:
+        grailsApplication.config.grails.plugins.jaxrs.dowriter.disable = false
     }
 
 

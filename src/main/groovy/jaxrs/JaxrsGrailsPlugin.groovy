@@ -180,7 +180,7 @@ Brief summary/description of the plugin.
     }
 
     private String getResourceScope() {
-        def scope = grailsApplication.config.org.grails.jaxrs.resource.scope
+        def scope = grailsApplication.config.grails.plugins.jaxrs.resource.scope
         if (!scope) {
             scope = 'prototype'
         }
