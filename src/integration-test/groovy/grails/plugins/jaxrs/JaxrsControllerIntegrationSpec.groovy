@@ -524,13 +524,20 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         response.getHeader('Content-Type').startsWith('text/html')
     }
 
-//    def 'specifyQueryParamsOnController'() {
-//
-//        controller.request.queryString = 'value=jim'
-//        sendRequest('/test/queryParam', 'GET')
-//        200 == response.status
-//        'jim' == response.contentAsString
-//    }
+    def 'specifyQueryParamsOnController'() {
+        setup:
+        controller.request.queryString = 'value=jim'
+
+        when:
+        sendRequest('/test/queryParam', 'GET')
+
+        then:
+        200 == response.status
+        'jim' == response.contentAsString
+
+        cleanup:
+        controller.request.queryString = null
+    }
 
     def 'specifyQueryParamsInRequestPath'() {
         when:
@@ -541,10 +548,18 @@ abstract class JaxrsControllerIntegrationSpec extends IntegrationTestSpec {
         'jim' == response.contentAsString
     }
 
-//    def 'specifyQueryParamsOnControllerAndInRequestPath'() {
-//        controller.request.queryString = 'value=bob'
-//        sendRequest('/test/queryParam?value=jim', 'GET')
-//        200 == response.status
-//        'jim' == response.contentAsString
-//    }
+    def 'specifyQueryParamsOnControllerAndInRequestPath'() {
+        setup:
+        controller.request.queryString = 'value=bob'
+
+        when:
+        sendRequest('/test/queryParam?value=jim', 'GET')
+
+        then:
+        200 == response.status
+        'jim' == response.contentAsString
+
+        cleanup:
+        controller.request.queryString = null
+    }
 }
