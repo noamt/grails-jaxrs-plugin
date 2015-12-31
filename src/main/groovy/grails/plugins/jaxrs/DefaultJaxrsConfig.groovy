@@ -21,7 +21,7 @@ class DefaultJaxrsConfig  {
             public void onStartup(ServletContext servletContext) throws ServletException {
 //                servletContext.addListener(JaxrsListener.name)
                 servletContext.addFilter('jaxrsFilter', JaxrsFilter.name)
-                servletContext.addServlet('grails', GrailsDispatcherServlet.name).setLoadOnStartup(1)
+//                servletContext.addServlet('grails', GrailsDispatcherServlet.name).setLoadOnStartup(1)
 //                servletContext.getServletRegistration('grails').setInitParameter('dispatchOptionsRequest', 'true')
 
             }
