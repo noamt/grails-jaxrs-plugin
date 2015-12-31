@@ -2,6 +2,8 @@
 package grails.plugins.jaxrs.infra
 
 import grails.core.GrailsApplication
+import grails.plugins.jaxrs.JaxrsController
+import grails.test.mixin.TestFor
 import org.apache.commons.lang.StringUtils
 import grails.plugins.jaxrs.web.JaxrsContext
 import grails.plugins.jaxrs.web.JaxrsUtils
@@ -15,6 +17,7 @@ import javax.ws.rs.core.HttpHeaders
 /**
  * @author Noam Y. Tenne
  */
+@TestFor(JaxrsController)
 abstract class IntegrationTestSpec extends Specification {
 
     @Autowired
@@ -23,7 +26,6 @@ abstract class IntegrationTestSpec extends Specification {
     @Shared
     def testEnvironment
 
-//    JaxrsController controller
 
     def setupSpec() {
         testEnvironment = null
