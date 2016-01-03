@@ -18,7 +18,6 @@ package grails.plugins.jaxrs.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Martin Krasser
  */
-@WebListener
+
 public class JaxrsListener implements ServletContextListener {
 
     private static final Log LOG = LogFactory.getLog(JaxrsListener.class);

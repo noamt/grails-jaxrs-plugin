@@ -2,6 +2,7 @@ package grails.plugins.jaxrs
 
 import grails.plugins.jaxrs.web.JaxrsFilter
 import grails.plugins.jaxrs.web.JaxrsListener
+import grails.util.Environment
 import org.grails.web.servlet.mvc.GrailsDispatcherServlet
 import org.springframework.boot.context.embedded.ServletContextInitializer
 import org.springframework.context.annotation.Bean
@@ -19,11 +20,10 @@ class DefaultJaxrsConfig  {
         return new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) throws ServletException {
-//                servletContext.addListener(JaxrsListener.name)
-                servletContext.addFilter('jaxrsFilter', JaxrsFilter.name)
-//                servletContext.addServlet('grails', GrailsDispatcherServlet.name).setLoadOnStartup(1)
-//                servletContext.getServletRegistration('grails').setInitParameter('dispatchOptionsRequest', 'true')
-
+                if (Environment.current != Environment.TEST) {
+                    servletContext.addFilter('jaxrsFilter', JaxrsFilter.name)
+                    servletContext.addListener(JaxrsListener)
+                }
             }
         }
     }

@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * A request wrapper that decorates {@link HttpServletRequest#getRequestURI()}.
  *
  * @author Martin Krasser
- *
  * @see JaxrsFilter
  */
 public class RequestWrapper extends HttpServletRequestWrapper {
 
     public RequestWrapper(HttpServletRequest request) {
         super(request);
+        JaxrsUtils.setRequestUriAttribute(this, request.getRequestURI());
     }
 
     /**
@@ -36,7 +36,6 @@ public class RequestWrapper extends HttpServletRequestWrapper {
      * {@link JaxrsFilter}.
      *
      * @return the request URI.
-     *
      * @see JaxrsUtils#REQUEST_URI_ATTRIBUTE_NAME
      */
     @Override
