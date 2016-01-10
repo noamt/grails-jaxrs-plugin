@@ -8,24 +8,29 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE") {
+            exclude group: 'ch.qos.logback', module:'logback-classic'
+        }
+        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.6.9'
     }
 }
 
 plugins {
-    id "io.spring.dependency-management" version "0.4.0.RELEASE"
-    id "com.jfrog.bintray" version "1.1"
+    id "io.spring.dependency-management" version "0.5.3.RELEASE"
+    id "com.jfrog.bintray" version "1.5"
 }
 
 version "0.1-SNAPSHOT"
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: "spring-boot"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-gsp"
-// Used for publishing to central repository, remove if not needed
+apply plugin: 'java'
+
+//// Used for publishing to central repository, remove if not needed
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
 apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
@@ -34,13 +39,14 @@ ext {
     gradleWrapperVersion = project.gradleWrapperVersion
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 
 repositories {
     mavenLocal()
-    mavenCentral()
+    jcenter()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "http://noams.artifactoryonline.com/noams/grails-jaxrs-plugin-libs" }
 }
@@ -52,68 +58,108 @@ dependencyManagement {
     applyMavenExclusions false
 }
 
+configurations {
+    provided.all*.exclude group: 'javax.servlet'
+}
+
 project.ext.restletVersion = '2.1.4'
-project.ext.jerseyVersion = '1.18.1'
+project.ext.jerseyVersion = '1.19'
 
 dependencies {
-    compile "org.restlet.gae:org.restlet:$restletVersion"
+    compile "org.grails:grails-core:$grailsVersion"
+    compile "org.grails:grails-bootstrap:$grailsVersion"
+    compile "org.springframework:spring-web:4.1.7.RELEASE"
+    compile "org.springframework:spring-context:4.1.7.RELEASE"
 
     compile("org.restlet.gae:org.restlet.ext.servlet:$restletVersion") {
-//        exclude; 'org.restlet'
-//        exclude'servlet-api'
+        exclude group: 'org.restlet.gae', module: 'org.restlet'
+        exclude group: 'javax.servlet', module: 'servlet-api'
     }
+
+    compile "org.codehaus.groovy:groovy-all:2.4.5"
+    compile "org.grails.plugins:scaffolding:3.1.2"
+    compile "ch.qos.logback:logback-classic:1.1.3"
+    compile "ch.qos.logback:logback-core:1.1.3"
+    compile "org.restlet.gae:org.restlet:$restletVersion"
 
     // A modified version (with removed META-INF/services/javax.ws.rs.ext.RuntimeDelegate)
     // is contained in project's custom lib directory and repository. This is needed because of a bug described
     // at http://restlet.tigris.org/issues/show_bug.cgi?id=1251
-    provided "org.restlet.gae:org.restlet.ext.jaxrs-noruntimedel:$restletVersion"
+    compile ("org.restlet.gae:org.restlet.ext.jaxrs-noruntimedel:$restletVersion") {
+        exclude group: 'javax.servlet', module: 'servlet-api'
+    }
 
     compile("org.restlet.gae:org.restlet.ext.json:$restletVersion") {
-//        excludes 'org.restlet'
+        exclude group: 'org.restlet.gae', module: 'org.restlet'
     }
 
     compile("com.sun.jersey:jersey-core:$jerseyVersion") {
-//        excludes 'jaxb-api', 'jsr311-api', 'junit', 'mail', 'org.osgi.core'
+        exclude group: 'javax.xml.bind', module: 'jaxb-api'
+        exclude group: 'javax.ws.rs', module: 'jsr311-api'
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'javax.mail', module: 'mail'
     }
 
     compile("com.sun.jersey:jersey-servlet:$jerseyVersion") {
-//        excludes 'ant', 'commons-io', 'javax.ejb', 'javax.servlet-api', 'jsp-api', 'junit', 'osgi_R4_core',
-//                'persistence-api', 'weld-osgi-bundle'
+        exclude group: 'org.apache.ant', module: 'ant'
+        exclude group: 'commons-io', module: 'commons-io'
+        exclude group: 'javax.servlet', module: 'javax.servlet-api'
+        exclude group: 'junit', module: 'junit'
     }
 
     compile("com.sun.jersey:jersey-server:$jerseyVersion") {
-//        excludes 'asm', 'commons-io', 'jaxb-api', 'jsr250-api', 'junit', 'mail', 'osgi_R4_core'
+        exclude group: 'asm', module: 'asm'
+        exclude group: 'commons-io', module: 'commons-io'
+        exclude group: 'javax.xml.bind', module: 'jaxb-api'
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'javax.mail', module: 'mail'
     }
 
     compile("com.sun.jersey:jersey-json:$jerseyVersion") {
-//        excludes 'jackson-core-asl', 'jackson-jaxrs', 'jackson-mapper-asl', 'jackson-xc', 'jaxb-impl', 'jettison', 'junit', 'org.eclipse.persistence.moxy'
+        exclude group: 'org.codehaus.jackson', module: 'jackson-core-asl'
+        exclude group: 'org.codehaus.jackson', module: 'jackson-jaxrs'
+        exclude group: 'org.codehaus.jackson', module: 'jackson-mapper-asl'
+        exclude group: 'org.codehaus.jackson', module: 'jackson-xc'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-impl'
+        exclude group: 'org.codehaus.jettison', module: 'jettison'
+        exclude group: 'junit', module: 'junit'
     }
 
     compile("com.sun.jersey.contribs:jersey-spring:$jerseyVersion") {
-//        excludes 'jaxb-impl', 'jsr250-api', 'junit', 'servlet-api', 'testng', 'spring-core', 'spring-beans',
-//                'spring-context', 'spring-web', 'spring-aop'
+        exclude group: 'com.sun.xml.bind', module: 'jaxb-impl'
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'javax.servlet', module: 'servlet-api'
+        exclude group: 'org.springframework', module: 'spring-core'
+        exclude group: 'org.springframework', module: 'spring-beans'
+        exclude group: 'org.springframework', module: 'spring-web'
+        exclude group: 'org.springframework', module: 'spring-context'
+        exclude group: 'org.springframework', module: 'spring-aop'
     }
 
     compile('javax.ws.rs:jsr311-api:1.1.1') {
-//        excludes 'junit'
+        exclude group: 'junit', module: 'junit'
     }
 
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    compile 'commons-logging:commons-logging:1.2'
+    compile ('org.springframework.boot:spring-boot-starter-logging') {
+        exclude group: 'org.slf4j', module:'log4j-over-slf4j'
+    }
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
 
-    provided "org.grails:grails-web-boot"
-    provided "org.grails:grails-dependencies"
-    provided 'javax.servlet:javax.servlet-api:3.1.0'
+    compile "org.grails:grails-web-boot:$grailsVersion"
+    compile "org.grails:grails-dependencies:$grailsVersion"
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails:grails-plugin-testing:$grailsVersion"
+    testCompile "ch.qos.logback:logback-core:1.1.3"
 
-    console "org.grails:grails-console"
+    console "org.grails:grails-console:3.0.10"
 
     jar {
         from('src/integration-test/groovy') {
-            include 'org/grails/jaxrs/infra/*'
+            include 'org/grails/plugins/jaxrs/infra/*'
         }
     }
 }
