@@ -62,7 +62,7 @@ configurations {
     provided.all*.exclude group: 'javax.servlet'
 }
 
-project.ext.restletVersion = '2.1.4'
+project.ext.restletVersion = '2.3.5'
 project.ext.jerseyVersion = '1.19'
 
 dependencies {
@@ -85,7 +85,7 @@ dependencies {
     // A modified version (with removed META-INF/services/javax.ws.rs.ext.RuntimeDelegate)
     // is contained in project's custom lib directory and repository. This is needed because of a bug described
     // at http://restlet.tigris.org/issues/show_bug.cgi?id=1251
-    compile ("org.restlet.gae:org.restlet.ext.jaxrs-noruntimedel:$restletVersion") {
+    compile ("org.restlet.gae:org.restlet.ext.jaxrs:$restletVersion") {
         exclude group: 'javax.servlet', module: 'servlet-api'
     }
 

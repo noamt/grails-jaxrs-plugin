@@ -20,10 +20,10 @@ class DefaultJaxrsConfig  {
         return new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) throws ServletException {
-                if (Environment.current != Environment.TEST) {
+//                if (Environment.current != Environment.TEST) {
                     servletContext.addFilter('jaxrsFilter', JaxrsFilter.name)
                     servletContext.addListener(JaxrsListener)
-                }
+//                }
             }
         }
     }
