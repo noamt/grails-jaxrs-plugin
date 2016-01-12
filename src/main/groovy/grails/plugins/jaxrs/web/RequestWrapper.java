@@ -28,7 +28,6 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
     public RequestWrapper(HttpServletRequest request) {
         super(request);
-        JaxrsUtils.setRequestUriAttribute(this, request.getRequestURI());
     }
 
     /**

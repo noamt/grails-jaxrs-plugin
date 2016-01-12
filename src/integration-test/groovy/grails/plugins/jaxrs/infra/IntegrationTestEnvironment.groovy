@@ -40,7 +40,6 @@ import javax.servlet.ServletContextListener
  */
 class IntegrationTestEnvironment {
 
-    @Autowired
     private JaxrsContext jaxrsContext
 
     private String contextConfigLocations
