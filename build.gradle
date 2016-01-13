@@ -157,6 +157,7 @@ dependencies {
 
     console "org.grails:grails-console:3.0.10"
 
+
     jar {
         from('src/integration-test/groovy') {
             include 'org/grails/plugins/jaxrs/infra/*'
