@@ -2,7 +2,7 @@
 grails:
     profile: web-plugin
     codegen:
-        defaultPackage: org.grails.jaxrs
+        defaultPackage: jaxrs
 info:
     app:
         name: '@info.app.name@'
@@ -23,6 +23,7 @@ grails:
                         - Gecko
                         - WebKit
                         - Presto
+
                         - Trident
         types:
             all: '*/*'
@@ -30,7 +31,7 @@ grails:
             css: text/css
             csv: text/csv
             form: application/x-www-form-urlencoded
-            html: 
+            html:
               - text/html
               - application/xhtml+xml
             js: text/javascript
@@ -38,9 +39,10 @@ grails:
               - application/json
               - text/json
             multipartForm: multipart/form-data
+            pdf: application/pdf
             rss: application/rss+xml
             text: text/plain
-            hal: 
+            hal:
               - application/hal+json
               - application/hal+xml
             xml:
@@ -53,9 +55,6 @@ grails:
         defaultScope: singleton
     converters:
         encoding: UTF-8
-    hibernate:
-        cache:
-            queries: false
     views:
         default:
             codec: html
@@ -67,3 +66,4 @@ grails:
                 scriptlets: html
                 taglib: none
                 staticparts: none
+
